@@ -11,6 +11,9 @@ RUN npm install
 # Copiar código fuente
 COPY . .
 
+# Generar cliente Prisma
+RUN npx prisma generate
+
 # Exponer puerto
 EXPOSE 5000
 
