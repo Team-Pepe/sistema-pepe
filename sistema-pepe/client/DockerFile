@@ -1,0 +1,28 @@
+# Etapa de construcción
+FROM node:20-alpine as build
+
+WORKDIR /app
+
+# Copiar archivos de configuración
+COPY package*.json ./
+
+# Instalar dependencias
+RUN npm install
+
+# Copiar código fuente
+COPY . .
+
+# Construir la aplicación
+RUN npm run build
+
+# Etapa de producción
+FROM nginx:alpine
+
+# Copiar archivos de construcción a nginx
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Exponer puerto
+EXPOSE 4000
+
+# Iniciar nginx
+CMD ["nginx", "-g", "daemon off;"]
