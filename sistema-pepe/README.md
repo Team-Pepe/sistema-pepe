@@ -1,4 +1,8 @@
-# React + Vite
+# Sistema Pepe
+
+Este proyecto está estructurado con una arquitectura de frontend y backend separados.
+
+## Estructura del Proyecto
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
