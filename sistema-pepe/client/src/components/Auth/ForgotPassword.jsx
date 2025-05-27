@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
-function ForgotPassword({ onLoginClick }) {
+function ForgotPassword() {
   const [email, setEmail] = useState('')
   const [isSent, setIsSent] = useState(false)
+  const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -59,16 +60,12 @@ function ForgotPassword({ onLoginClick }) {
               {/* Enlaces de navegación */}
               <div className="text-center text-sm animate-slide-up" style={{animationDelay: '0.6s', animationFillMode: 'both'}}>
                 <span className="text-white">¿Recordaste tu contraseña? </span>
-                <a 
-                  href="#" 
-                  onClick={(e) => {
-                    e.preventDefault()
-                    onLoginClick()
-                  }}
+                <Link 
+                  to="/login"
                   className="text-white hover:text-indigo-200 transition-all duration-300 hover:underline font-semibold ml-1"
                 >
                   Inicia sesión
-                </a>
+                </Link>
               </div>
               
               {/* Botón de Enviar */}
@@ -96,7 +93,7 @@ function ForgotPassword({ onLoginClick }) {
                 <p className="text-white/80 mb-6">Hemos enviado un enlace de recuperación a tu correo electrónico. Por favor revisa tu bandeja de entrada.</p>
                 
                 <button
-                  onClick={onLoginClick}
+                  onClick={() => navigate('/login')}
                   className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold py-2 px-4 rounded-md transition-all duration-500 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform hover:scale-105 hover:shadow-xl active:scale-95"
                 >
                   VOLVER AL INICIO

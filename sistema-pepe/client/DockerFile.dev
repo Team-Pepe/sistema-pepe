@@ -4,14 +4,14 @@ WORKDIR /app
 
 COPY package*.json ./
 
-# Instalar dependencias
-RUN npm install
-# Instalar específicamente react-router-dom
-RUN npm install react-router-dom@7.6.1
+# Instalar dependencias con --legacy-peer-deps para evitar problemas de compatibilidad
+RUN npm install --legacy-peer-deps
 
 COPY . .
 
 EXPOSE 3000
 
-# Script de inicio que reinstala dependencias y luego inicia el servidor
-CMD ["sh", "-c", "npm install && npm run dev"]
+# Usar --legacy-peer-deps también al reinstalar
+CMD ["sh", "-c", "npm install --legacy-peer-deps && npm run dev"]
+# Instalar específicamente react-router-dom
+RUN npm install react-router-dom@7.6.1
