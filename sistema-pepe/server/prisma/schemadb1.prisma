@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model DocumentType {
+  id       Int      @id @default(autoincrement())
+  typeName String   @unique @db.VarChar(50)
+  users    User[]
+
+  @@map("document_types")
+}
+
+model User {
+  id             Int          @id
+  name           String       @db.VarChar(100)
+  documentType   DocumentType @relation(fields: [documentTypeId], references: [id])
+  documentTypeId Int          @map("document_type_id")
+  email          String       @unique @db.VarChar(100)
+  password       String       @db.Text
+  phone          String       @db.VarChar(20)
+  address        String       @db.VarChar(200)
+  age            Int
+
+  @@map("users")
+}
