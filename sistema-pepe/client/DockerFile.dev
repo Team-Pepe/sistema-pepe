@@ -3,10 +3,15 @@ FROM node:20-alpine
 WORKDIR /app
 
 COPY package*.json ./
+
+# Instalar dependencias
 RUN npm install
+# Instalar específicamente react-router-dom
+RUN npm install react-router-dom@7.6.1
 
 COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+# Script de inicio que reinstala dependencias y luego inicia el servidor
+CMD ["sh", "-c", "npm install && npm run dev"]

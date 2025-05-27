@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import Login from './components/Login'
-import Register from './components/Register'
-import ForgotPassword from './components/ForgotPassword'
+import Login from './components/Auth/Login'
+import Register from './components/Auth/Register'
+import ForgotPassword from './components/Auth/ForgotPassword'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('login')

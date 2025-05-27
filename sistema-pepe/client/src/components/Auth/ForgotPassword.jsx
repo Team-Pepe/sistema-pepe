@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 function ForgotPassword({ onLoginClick }) {
   const [email, setEmail] = useState('')
@@ -101,6 +102,15 @@ function ForgotPassword({ onLoginClick }) {
                   VOLVER AL INICIO
                 </button>
               </div>
+              
+              // Cambiar el enlace de vuelta al login
+              // Busca donde está el enlace "Volver al login" y reemplázalo con:
+              <Link 
+                to="/login"
+                className="text-white hover:text-indigo-200 transition-all duration-300 hover:underline"
+              >
+                Volver al login
+              </Link>
             </div>
           )}
         </div>

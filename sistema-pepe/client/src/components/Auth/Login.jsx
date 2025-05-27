@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 
-function Login({ onRegisterClick, onForgotPasswordClick }) {
+function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -94,27 +96,19 @@ function Login({ onRegisterClick, onForgotPasswordClick }) {
             <div className="flex justify-between items-center text-sm animate-slide-up" style={{animationDelay: '0.8s', animationFillMode: 'both'}}>
               <div className="flex items-center">
                 <span className="text-white">¿No tienes cuenta? </span>
-                <a 
-                  href="#" 
-                  onClick={(e) => {
-                    e.preventDefault()
-                    onRegisterClick()
-                  }}
+                <Link 
+                  to="/register"
                   className="text-white hover:text-indigo-200 transition-all duration-300 hover:underline font-semibold ml-1"
                 >
                   Regístrate
-                </a>
+                </Link>
               </div>
-              <a 
-                href="#" 
-                onClick={(e) => {
-                  e.preventDefault()
-                  onForgotPasswordClick()
-                }}
+              <Link 
+                to="/forgot-password"
                 className="text-white hover:text-indigo-200 transition-all duration-300 hover:underline"
               >
                 ¿Olvidaste tu contraseña?
-              </a>
+              </Link>
             </div>
             
             {/* Botón de Login */}
