@@ -11,6 +11,9 @@ function Login() {
     e.preventDefault()
     console.log('Login attempt with:', { email, password })
     // Aquí iría la lógica de autenticación cuando implementes el backend
+    
+    // Redirigir al dashboard después del login (simulado)
+    navigate('/dashboard')
   }
 
   const togglePasswordVisibility = () => {
