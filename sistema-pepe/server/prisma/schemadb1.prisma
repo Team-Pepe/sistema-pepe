@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/client/db1"
 }
 
 datasource db {
@@ -9,15 +10,15 @@ datasource db {
 }
 
 model DocumentType {
-  id       Int      @id @default(autoincrement())
-  typeName String   @unique @db.VarChar(50)
+  id       Int    @id @default(autoincrement())
+  typeName String @unique @db.VarChar(50)
   users    User[]
 
   @@map("document_types")
 }
 
 model User {
-  id             Int          @id
+  id             Int          @id @default(autoincrement())
   name           String       @db.VarChar(100)
   documentType   DocumentType @relation(fields: [documentTypeId], references: [id])
   documentTypeId Int          @map("document_type_id")

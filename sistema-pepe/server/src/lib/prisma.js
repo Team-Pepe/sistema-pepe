@@ -1,5 +1,17 @@
-// import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client'
 
-// const prisma = new PrismaClient();
+export const prismaDB1 = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL
+    }
+  }
+})
 
-// export default prisma;
+export const prismaDB2 = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL_DB2
+    }
+  }
+})
