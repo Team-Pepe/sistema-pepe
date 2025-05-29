@@ -1,19 +1,35 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
+import { useAuth } from '../../routes'
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
+  const { login } = useAuth()
+
+  // Obtener la ruta a la que el usuario intentaba acceder (si existe)
+  const from = location.state?.from?.pathname || '/dashboard'
 
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('Login attempt with:', { email, password })
     // Aquí iría la lógica de autenticación cuando implementes el backend
     
-    // Redirigir al dashboard después del login (simulado)
-    navigate('/dashboard')
+    // Simular un login exitoso con los datos del usuario
+    const userData = {
+      id: 1,
+      email,
+      name: 'Usuario de Prueba'
+    }
+    
+    // Llamar a la función login del contexto
+    login(userData)
+    
+    // Redirigir a la página que el usuario intentaba acceder o al dashboard
+    navigate(from, { replace: true })
   }
 
   const togglePasswordVisibility = () => {
