@@ -2,9 +2,21 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Instalamos dependencias necesarias
+RUN apk add --no-cache libc6-compat openssl
+
+# Copiamos archivos necesarios primero
 COPY package*.json ./
+COPY prisma ./prisma/
+
+# Instalamos dependencias
 RUN npm install
 
+# Generamos los clientes de Prisma
+RUN npx prisma generate --schema=./prisma/schemadb1.prisma
+RUN npx prisma generate --schema=./prisma/schemadb2.prisma
+
+# Copiamos el resto de archivos
 COPY . .
 
 EXPOSE 5000
