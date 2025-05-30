@@ -1,21 +1,33 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache libc6-compat openssl
+
+# Copy configuration files
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# Install dependencies
+RUN npm install
+
+# Generate Prisma Clients
+RUN npx prisma generate --schema=./prisma/schemadb1.prisma
+RUN npx prisma generate --schema=./prisma/schemadb2.prisma
+
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Copiar archivos de configuración
-COPY package*.json ./
+# Install production dependencies
+RUN apk add --no-cache libc6-compat openssl
 
-# Instalar dependencias
-RUN npm install
-
-# Copiar código fuente
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/prisma ./prisma
 COPY . .
 
-# Generar cliente Prisma
-# RUN npx prisma generate
-
-# Exponer puerto
 EXPOSE 5000
 
-# Comando para iniciar la aplicación
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]

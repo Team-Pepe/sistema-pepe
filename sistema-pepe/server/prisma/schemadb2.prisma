@@ -1,7 +1,8 @@
 generator clientdb2 {
-  provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client/db2"
-  name     = "db2"
+  provider      = "prisma-client-js"
+  output        = "../node_modules/.prisma/client/db2"
+  name          = "db2"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db2 {
@@ -12,8 +13,8 @@ datasource db2 {
 
 model UserDB2 {
   id       Int    @id @default(autoincrement())
-  email    String @unique @db.VarChar(100)
-  password String @db.Text
+  email    String @unique @db2.VarChar(100)
+  password String @db2.Text
 
   @@map("users_db2")
 }

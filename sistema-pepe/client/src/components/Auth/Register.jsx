@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { register } from '../../services/authService'
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -30,24 +31,34 @@ function Register() {
     ])
   }, [])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (formData.password !== formData.confirmPassword) {
-      alert('Las contraseñas no coinciden')
-      return
+    try {
+      if (formData.password !== formData.confirmPassword) {
+        alert('Las contraseñas no coinciden')
+        return
+      }
+      
+      const age = calculateAge(formData.birthdate)
+      
+      const dataToSubmit = {
+        name: formData.name,
+        documentTypeId: parseInt(formData.documentTypeId),
+        documentId: formData.documentId,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        address: formData.address,
+        age
+      }
+      
+      const response = await register(dataToSubmit)
+      console.log('Usuario registrado:', response)
+      navigate('/login')
+    } catch (error) {
+      console.error('Error al registrar:', error)
+      alert(error.message || 'Error al registrar usuario')
     }
-    
-    // Calcular la edad a partir de la fecha de nacimiento
-    const age = calculateAge(formData.birthdate)
-    
-    // Crear objeto con datos para enviar al backend
-    const dataToSubmit = {
-      ...formData,
-      age // Incluir la edad calculada
-    }
-    
-    console.log('Register attempt with:', dataToSubmit)
-    // Aquí iría la lógica de registro cuando implementes el backend
   }
 
   // Función para calcular la edad a partir de la fecha de nacimiento
