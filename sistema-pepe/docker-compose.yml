@@ -6,7 +6,9 @@ services:
       context: ./client
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "3000:3000"  # Cambiado a 3000 que es el puerto por defecto de Vite
+    environment:
+      - VITE_API_URL=http://server:5000
     depends_on:
       - server
     networks:
@@ -24,9 +26,11 @@ services:
       - "5000:5000"
     environment:
       - PORT=5000
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/sistema_pepe?schema=public
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/userdb
+      - DATABASE_URL_DB2=postgresql://postgres:${DB2_PASSWORD}@postgres_db2:5433/authdb
     depends_on:
       - postgres
+      - postgres_db2
     networks:
       - app-network
     # Para desarrollo, descomenta estas líneas:
@@ -35,15 +39,28 @@ services:
     #   - /app/node_modules
 
   postgres:
-    image: postgres:16
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: userdb
     ports:
       - "5432:5432"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=sistema_pepe
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  postgres_db2:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB2_PASSWORD}
+      POSTGRES_DB: authdb
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_auth:/var/lib/postgresql/data
     networks:
       - app-network
 
@@ -52,4 +69,5 @@ networks:
     driver: bridge
 
 volumes:
-  postgres-data:
+  postgres_data:
+  postgres_data_auth:

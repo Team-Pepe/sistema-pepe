@@ -1,37 +1,22 @@
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 
 WORKDIR /app
 
 # Instalamos dependencias necesarias
 RUN apk add --no-cache libc6-compat openssl
 
-# Copiamos solo los archivos necesarios primero
+# Copiamos archivos necesarios
 COPY package*.json ./
 COPY prisma ./prisma/
 
 # Instalamos dependencias
 RUN npm install
 
-# Generamos los clientes de Prisma
-RUN npx prisma generate --schema=./prisma/schemadb1.prisma
-RUN npx prisma generate --schema=./prisma/schemadb2.prisma
+# Generamos el cliente de Prisma
+RUN npx prisma generate
 
-# Segunda etapa
-FROM node:20-alpine
-
-WORKDIR /app
-
-# Instalamos solo las dependencias necesarias para producción
-RUN apk add --no-cache libc6-compat openssl
-
-# Copiamos los archivos necesarios desde la etapa de builder
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/prisma ./prisma
+# Copiamos el resto de los archivos
 COPY . .
-
-# Variable de entorno para indicar que estamos en Docker
-ENV IN_DOCKER=true
 
 EXPOSE 5000
 
