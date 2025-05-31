@@ -1,16 +1,14 @@
 {
-  "name": "sistema-pepe-server",
+  "name": "server",
   "version": "1.0.0",
-  "description": "Backend para Sistema Pepe",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:push": "prisma db push"
+    "prisma:push": "prisma db push --accept-data-loss"
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",
@@ -18,11 +16,12 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
-    "express": "^4.21.2",
-    "jsonwebtoken": "^9.0.2"
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1",
+    "nodemon": "^3.1.10",
     "prisma": "^6.8.2"
   }
 }
