@@ -12,12 +12,12 @@ datasource db {
 model DocumentType {
   id       Int    @id @default(autoincrement())
   typeName String @unique @db.VarChar(50)
-  users    User[]
+  users    Users[]
 
   @@map("document_types")
 }
 
-model User {
+model Users {
   id             Int          @id @default(autoincrement())
   name           String       @db.VarChar(100)
   documentType   DocumentType @relation(fields: [documentTypeId], references: [id])

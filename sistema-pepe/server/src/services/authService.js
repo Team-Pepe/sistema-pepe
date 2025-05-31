@@ -1,23 +1,24 @@
 import prisma from '../lib/prisma.js'
-import { hashPassword, comparePasswords } from '../utils/encryption.js'
+import { hashPassword } from '../utils/encryption.js'
 import { generateToken } from '../config/jwt.js'
 
 export const registerUser = async (userData) => {
   const { email, password, ...restData } = userData
 
-  // Verificar si el usuario ya existe
-  const existingUser = await prisma.user.findUnique({
-    where: { email }
-  })
-
-  if (existingUser) {
-    throw new Error('User already exists')
-  }
-
-  const hashedPassword = await hashPassword(password)
-
   try {
-    const newUser = await prisma.user.create({
+    // Check if user exists
+    const existingUser = await prisma.users.findUnique({
+      where: { email }
+    })
+
+    if (existingUser) {
+      throw new Error('User already exists')
+    }
+
+    const hashedPassword = await hashPassword(password)
+
+    // Create new user
+    const newUser = await prisma.users.create({
       data: {
         ...restData,
         email,
@@ -31,34 +32,15 @@ export const registerUser = async (userData) => {
       }
     })
 
-    // Generar token JWT
+    // Generate JWT token
     const token = generateToken({
       id: newUser.id,
-      email: newUser.email,
-      name: newUser.name
+      email: newUser.email
     })
 
     return { user: newUser, token }
   } catch (error) {
-    throw new Error(`Registration failed: ${error.message}`)
-  }
-}
-
-export const validateCredentials = async (email, password) => {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { email },
-      include: {
-        documentType: true
-      }
-    })
-
-    if (!user || !(await comparePasswords(password, user.password))) {
-      throw new Error('Invalid credentials')
-    }
-
-    return user
-  } catch (error) {
-    throw new Error(`Authentication error: ${error.message}`)
+    console.error('Error in registerUser:', error)
+    throw error
   }
 }

@@ -4,34 +4,30 @@ export const register = async (req, res) => {
   try {
     const { birthdate, ...userData } = req.body
 
-    // Calcular edad
+    // Calculate age
     const age = calculateAge(birthdate)
     
-    // Registrar usuario
-    const { user, token } = await registerUser({
+    // Register user with calculated age
+    const result = await registerUser({
       ...userData,
       age
     })
 
     res.status(201).json({
       success: true,
-      message: 'Usuario registrado exitosamente',
-      data: {
-        user,
-        token
-      }
+      data: result
     })
 
   } catch (error) {
-    console.error('Error en registro:', error)
-    res.status(error.message.includes('already exists') ? 409 : 500).json({
+    console.error('Error in register controller:', error)
+    res.status(error.message === 'User already exists' ? 409 : 500).json({
       success: false,
       message: error.message
     })
   }
 }
 
-// Función auxiliar para calcular edad
+// Helper function to calculate age
 const calculateAge = (birthdate) => {
   const today = new Date()
   const birthdateObj = new Date(birthdate)
