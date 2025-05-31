@@ -10,27 +10,37 @@ function Register() {
     email: '',
     phone: '',
     address: '',
-    birthdate: '', // Cambiado de 'age' a 'birthdate'
+    birthdate: '',  // Changed from age to birthdate
     password: '',
-    confirmPassword: ''
+    confirmPassword: '' // Add this line
   })
+
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [documentTypes, setDocumentTypes] = useState([])
+
+  const [documentTypes] = useState([
+    { id: 1, typeName: 'Tarjeta de Identidad' },
+    { id: 2, typeName: 'Cédula de Ciudadanía' },
+    { id: 3, typeName: 'Pasaporte' },
+    { id: 4, typeName: 'Cédula de Extranjería' }
+  ])
+  
   const navigate = useNavigate()
 
-  // Simulación de tipos de documento para el frontend
-  // En producción, estos datos vendrían del backend
-  useEffect(() => {
-    // Datos de ejemplo para el selector de tipo de documento
-    setDocumentTypes([
-      { id: 1, typeName: 'Cédula de Ciudadanía' },
-      { id: 2, typeName: 'Tarjeta de Identidad' },
-      { id: 3, typeName: 'Pasaporte' },
-      { id: 4, typeName: 'Cédula de Extranjería' }
-    ])
-  }, [])
+  // Add calculateAge function
+  const calculateAge = (birthdate) => {
+    if (!birthdate) return 0
+    const today = new Date()
+    const birthdateObj = new Date(birthdate)
+    let age = today.getFullYear() - birthdateObj.getFullYear()
+    const monthDiff = today.getMonth() - birthdateObj.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdateObj.getDate())) {
+      age--
+    }
+    return age
+  }
 
+  // Update handleSubmit to include password validation
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
@@ -38,19 +48,18 @@ function Register() {
         alert('Las contraseñas no coinciden')
         return
       }
-      
-      const age = calculateAge(formData.birthdate)
-      
+
       const dataToSubmit = {
-        name: formData.name,
+        ...formData,
         documentTypeId: parseInt(formData.documentTypeId),
-        documentId: formData.documentId,
-        email: formData.email,
-        password: formData.password,
-        phone: formData.phone,
-        address: formData.address,
-        age
+        age: calculateAge(formData.birthdate), // Calculate age from birthdate
+        password: formData.password // Only send the password, not confirmPassword
       }
+
+      delete dataToSubmit.confirmPassword // Remove confirmPassword before sending
+      delete dataToSubmit.birthdate // Remove birthdate as we're sending age
+
+      console.log('Datos a enviar:', dataToSubmit)
       
       const response = await register(dataToSubmit)
       console.log('Usuario registrado:', response)
@@ -61,23 +70,6 @@ function Register() {
     }
   }
 
-  // Función para calcular la edad a partir de la fecha de nacimiento
-  const calculateAge = (birthdate) => {
-    if (!birthdate) return 0
-    
-    const today = new Date()
-    const birthdateObj = new Date(birthdate)
-    
-    let age = today.getFullYear() - birthdateObj.getFullYear()
-    const monthDiff = today.getMonth() - birthdateObj.getMonth()
-    
-    // Si aún no ha cumplido años este año, restar 1
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdateObj.getDate())) {
-      age--
-    }
-    
-    return age
-  }
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({
@@ -154,13 +146,14 @@ function Register() {
                   onChange={handleInputChange}
                   className="w-full pl-10 pr-3 py-2 bg-indigo-900/50 border border-white/20 rounded-md text-white
                              focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent
-                             transition-all duration-500 focus:bg-indigo-900/70 hover:bg-indigo-900/60
-                             placeholder:transition-colors placeholder:duration-300"
+                             transition-all duration-500 focus:bg-indigo-900/70 hover:bg-indigo-900/60"
                   required
                 >
-                  <option value="" disabled>Tipo documento</option>
+                  <option value="">Seleccione tipo de documento</option>
                   {documentTypes.map(type => (
-                    <option key={type.id} value={type.id}>{type.typeName}</option>
+                    <option key={type.id} value={type.id}>
+                      {type.typeName}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -194,7 +187,7 @@ function Register() {
               <div className="relative animate-slide-up" style={{animationDelay: '0.55s', animationFillMode: 'both'}}>
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none transition-colors duration-300">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 012 2z" />
                   </svg>
                 </div>
                 <input

@@ -1,6 +1,5 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -21,7 +20,7 @@ model Users {
   documentId     String       @id @db.VarChar(50)  // Ahora es la llave primaria
   name           String       @db.VarChar(100)
   documentType   DocumentType @relation(fields: [documentTypeId], references: [id])
-  documentTypeId Int          @map("document_type_id")
+  documentTypeId Int          
   email          String       @unique @db.VarChar(100)
   password       String       @db.Text
   phone          String       @db.VarChar(20)

@@ -8,39 +8,59 @@ export class AuthService {
   async register(userData) {
     const { name, documentTypeId, documentId, email, password, phone, address, age } = userData;
 
-   /* // Verificar si el usuario ya existe
-    const existingUser = await prisma.users.findUnique({
-      where: { email }
+    // Verificar si el usuario ya existe (descomentar y mejorar la validación)
+    const existingUser = await prisma.users.findFirst({
+      where: {
+        OR: [
+          { email },
+          { documentId }
+        ]
+      }
     });
 
     if (existingUser) {
-      throw new Error('El usuario ya existe');
-    }*/
+      throw new Error(
+        existingUser.email === email 
+          ? 'El email ya está registrado' 
+          : 'El número de documento ya está registrado'
+      );
+    }
+
+    // Validar que documentTypeId sea un número válido
+    const documentType = await prisma.documentType.findUnique({
+      where: { id: parseInt(documentTypeId) }
+    });
+
+    if (!documentType) {
+      throw new Error('Tipo de documento inválido');
+    }
 
     // Hash de la contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Crear el usuario
+    // Crear el usuario con los datos validados
     const user = await prisma.users.create({
       data: {
         name,
-        documentTypeId,
+        documentTypeId: parseInt(documentTypeId),
         documentId,
-        email,
+        email: email.toLowerCase(),
         password: hashedPassword,
         phone,
         address,
-        age
+        age: parseInt(age)
       }
     });
 
     // Generar token
     const token = jwt.sign(
-      { id: user.documentId, email: user.email },  // Cambiado de user.id a user.documentId
+      { id: user.documentId, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
 
-    return { user, token };
+    // Retornar usuario sin la contraseña
+    const { password: _, ...userWithoutPassword } = user;
+    return { user: userWithoutPassword, token };
   }
 }

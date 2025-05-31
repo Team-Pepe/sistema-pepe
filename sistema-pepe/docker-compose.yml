@@ -6,17 +6,13 @@ services:
       context: ./client
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"  # Cambiado a 3000 que es el puerto por defecto de Vite
+      - "3000:3000"
     environment:
       - VITE_API_URL=http://server:5000
     depends_on:
       - server
     networks:
       - app-network
-    # Para desarrollo, descomenta estas líneas:
-    # volumes:
-    #   - ./client:/app
-    #   - /app/node_modules
 
   server:
     build:
@@ -25,27 +21,9 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/pepedb
+      - DATABASE_URL=${DATABASE_URL}
+      - DIRECT_URL=${DIRECT_URL}
       - NODE_ENV=development
-    depends_on:
-      - postgres
-    networks:
-      - app-network
-    # Para desarrollo, descomenta estas líneas:
-    # volumes:
-    #   - ./server:/app
-    #   - /app/node_modules
-
-  postgres:
-    image: postgres:latest
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: pepedb
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
 

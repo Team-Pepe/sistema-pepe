@@ -2,7 +2,7 @@ const API_URL = 'http://localhost:5000/api'
 
 export const register = async (userData) => {
   try {
-    const response = await fetch(`${API_URL}/auth/register`, {
+    const response = await fetch('http://localhost:5000/api/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -13,16 +13,12 @@ export const register = async (userData) => {
     const data = await response.json()
 
     if (!response.ok) {
-      throw new Error(data.message)
-    }
-
-    // Guardar el token en localStorage
-    if (data.data.token) {
-      localStorage.setItem('token', data.data.token)
+      throw new Error(data.message || 'Error en el registro')
     }
 
     return data
   } catch (error) {
-    throw new Error(error.message)
+    console.error('Error en la solicitud:', error)
+    throw error
   }
 }
