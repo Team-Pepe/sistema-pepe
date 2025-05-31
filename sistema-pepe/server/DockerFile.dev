@@ -2,23 +2,26 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Instalamos dependencias necesarias
+# Install dependencies
 RUN apk add --no-cache libc6-compat openssl
 
-# Copiamos archivos necesarios primero
+# Copy package files and prisma schema
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Instalamos dependencias
+# Install dependencies
 RUN npm install
 
-# Generamos los clientes de Prisma
-RUN npx prisma generate --schema=./prisma/schemadb1.prisma
-RUN npx prisma generate --schema=./prisma/schemadb2.prisma
+# Clean Prisma cache
+RUN rm -rf node_modules/.prisma
 
-# Copiamos el resto de archivos
+# Generate Prisma Client
+RUN npx prisma generate
+
+# Copy rest of the application
 COPY . .
 
 EXPOSE 5000
 
+# Start the application
 CMD ["npm", "run", "dev"]

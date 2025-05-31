@@ -8,9 +8,9 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prisma:generate:db1": "prisma generate --schema=./prisma/schemadb1.prisma",
-    "prisma:generate:db2": "prisma generate --schema=./prisma/schemadb2.prisma",
-    "prisma:generate": "npm run prisma:generate:db1 && npm run prisma:generate:db2"
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:push": "prisma db push"
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",

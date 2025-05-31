@@ -1,54 +1,63 @@
-import { prismaDB1, prismaDB2 } from '../lib/prisma.js'
+import prisma from '../lib/prisma.js'
 import { hashPassword, comparePasswords } from '../utils/encryption.js'
+import { generateToken } from '../config/jwt.js'
 
 export const registerUser = async (userData) => {
   const { email, password, ...restData } = userData
+
+  // Verificar si el usuario ya existe
+  const existingUser = await prisma.user.findUnique({
+    where: { email }
+  })
+
+  if (existingUser) {
+    throw new Error('User already exists')
+  }
+
   const hashedPassword = await hashPassword(password)
 
   try {
-    // Crear usuario en DB1 (datos principales)
-    const user = await prismaDB1.user.create({
+    const newUser = await prisma.user.create({
       data: {
         ...restData,
         email,
         password: hashedPassword,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        documentType: true
       }
     })
 
-    // Crear credenciales en DB2 (autenticación)
-    await prismaDB2.userAuth.create({
-      data: {
-        email,
-        password: hashedPassword
-      }
+    // Generar token JWT
+    const token = generateToken({
+      id: newUser.id,
+      email: newUser.email,
+      name: newUser.name
     })
 
-    return user
+    return { user: newUser, token }
   } catch (error) {
-    throw new Error(`Error creating user: ${error.message}`)
+    throw new Error(`Registration failed: ${error.message}`)
   }
 }
 
 export const validateCredentials = async (email, password) => {
   try {
-    // Verificar credenciales en DB2
-    const authUser = await prismaDB2.userAuth.findUnique({
-      where: { email }
-    })
-
-    if (!authUser || !(await comparePasswords(password, authUser.password))) {
-      throw new Error('Invalid credentials')
-    }
-
-    // Si las credenciales son válidas, obtener datos completos de DB1
-    const userData = await prismaDB1.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { email },
       include: {
         documentType: true
       }
     })
 
-    return userData
+    if (!user || !(await comparePasswords(password, user.password))) {
+      throw new Error('Invalid credentials')
+    }
+
+    return user
   } catch (error) {
     throw new Error(`Authentication error: ${error.message}`)
   }

@@ -1,11 +1,13 @@
-import { Router } from 'express';
-import { register } from '../controllers/authController.js';
+import { Router } from 'express'
+import { register } from '../controllers/authController.js'
+import { authenticateToken } from '../middlewares/auth.middleware.js'
 
-const router = Router();
+const router = Router()
 
-router.post('/register', register);
-router.get('/test', (req, res) => {
-  res.json({ message: 'API funcionando correctamente' })
+router.post('/register', register)
+// Ejemplo de ruta protegida
+router.get('/profile', authenticateToken, (req, res) => {
+  res.json({ user: req.user })
 })
 
-export default router;
+export default router
