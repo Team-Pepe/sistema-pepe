@@ -36,7 +36,7 @@ export class AuthService {
 
     // Generar token
     const token = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user.documentId, email: user.email },  // Cambiado de user.id a user.documentId
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );

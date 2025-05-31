@@ -18,7 +18,7 @@ model DocumentType {
 }
 
 model Users {
-  id             Int          @id @default(autoincrement())
+  documentId     String       @id @db.VarChar(50)  // Ahora es la llave primaria
   name           String       @db.VarChar(100)
   documentType   DocumentType @relation(fields: [documentTypeId], references: [id])
   documentTypeId Int          @map("document_type_id")
