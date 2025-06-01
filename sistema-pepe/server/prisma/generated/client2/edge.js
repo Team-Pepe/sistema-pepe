@@ -117,7 +117,7 @@ exports.Prisma.ModelName = {
  */
 const config = {
   "generator": {
-    "name": "client",
+    "name": "client2",
     "provider": {
       "fromEnvVar": null,
       "value": "prisma-client-js"
@@ -148,19 +148,19 @@ const config = {
   "clientVersion": "6.8.2",
   "engineVersion": "2060c79ba17c6bb9f5823312b6f6b7f4a845738e",
   "datasourceNames": [
-    "db"
+    "db2"
   ],
   "activeProvider": "postgresql",
   "inlineDatasources": {
-    "db": {
+    "db2": {
       "url": {
         "fromEnvVar": "DATABASE_URL_DB2",
         "value": null
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/client2\"\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  url       = env(\"DATABASE_URL_DB2\")\n  directUrl = env(\"DIRECT_URL_DB2\")\n}\n\nmodel LoginUsers {\n  id       Int    @id @default(autoincrement())\n  email    String @unique @db.VarChar(100)\n  password String @db.Text\n\n  @@map(\"login_users\")\n}\n",
-  "inlineSchemaHash": "358db21b877564e6b6f590d9f3fceb4292b6dd82bbabb5bf52def3c56ab0a2a0",
+  "inlineSchema": "generator client2 {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/client2\"\n}\n\ndatasource db2 {\n  provider  = \"postgresql\"\n  url       = env(\"DATABASE_URL_DB2\")\n  directUrl = env(\"DIRECT_URL_DB2\")\n}\n\nmodel LoginUsers {\n  id       Int    @id @default(autoincrement())\n  email    String @unique @db2.VarChar(100)\n  password String @db2.Text\n\n  @@map(\"login_users\")\n}\n",
+  "inlineSchemaHash": "c382af007fb058359bee6d06c054d7b891c256f4cb9dc7a87e5e7d092ad1ba26",
   "copyEngine": true
 }
 config.dirname = '/'
