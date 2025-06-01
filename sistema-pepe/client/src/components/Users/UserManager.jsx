@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { userService } from '../../services/userService'
 import UserFormModal from './UserFormModal'
 
 function UserManager() {
@@ -8,49 +9,76 @@ function UserManager() {
   const [currentUser, setCurrentUser] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [documentTypes, setDocumentTypes] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  // Datos de ejemplo (simula datos del backend)
+  // Cargar usuarios y tipos de documento
   useEffect(() => {
-    // Simular carga de usuarios
-    const mockUsers = [
-      { id: 1, name: 'Juan Pérez', email: 'juan@ejemplo.com', documentType: 'CC', documentId: '123456789', phone: '3001234567', address: 'Calle 123', age: 30 },
-      { id: 2, name: 'María López', email: 'maria@ejemplo.com', documentType: 'CC', documentId: '987654321', phone: '3009876543', address: 'Carrera 456', age: 25 },
-      // Agrega más usuarios de ejemplo según necesites
-    ]
-    setUsers(mockUsers)
+    const loadData = async () => {
+      setLoading(true)
+      try {
+        // Cargar usuarios
+        const userData = await userService.getAll()
+        setUsers(userData)
+        
+        // Cargar tipos de documento
+        const typesData = await userService.getDocumentTypes()
+        setDocumentTypes(typesData)
+        
+        setError(null)
+      } catch (error) {
+        console.error('Error al cargar datos:', error)
+        setError('Error al cargar los datos. Por favor, intente nuevamente.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadData()
   }, [])
 
-  // Simular carga de tipos de documento (como en Register)
-  useEffect(() => {
-    setDocumentTypes([
-      { id: 1, typeName: 'Cédula de Ciudadanía' },
-      { id: 2, typeName: 'Tarjeta de Identidad' },
-      { id: 3, typeName: 'Pasaporte' },
-      { id: 4, typeName: 'Cédula de Extranjería' }
-    ])
-  }, [])
-
+  // Agregar estas funciones dentro del componente UserManager
   const handleEdit = (user) => {
     setCurrentUser(user)
     setIsModalOpen(true)
   }
 
-  const handleDelete = (userId) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
-      setUsers(users.filter(user => user.id !== userId))
+  const handleDelete = async (documentId) => {
+    if (window.confirm('¿Estás seguro de eliminar este usuario?')) {
+      try {
+        await userService.delete(documentId)
+        setUsers(users.filter(user => user.documentId !== documentId))
+      } catch (error) {
+        console.error('Error:', error)
+        alert(error.message)
+      }
     }
   }
 
-  const handleSubmit = (formData) => {
-    console.log('Form submitted:', formData)
-    // Aquí iría la lógica para enviar los datos al backend
-    setIsModalOpen(false)
+  const handleSubmit = async (formData) => {
+    try {
+      if (currentUser) {
+        // Actualizar
+        const updated = await userService.update(currentUser.documentId, formData)
+        setUsers(users.map(user => 
+          user.documentId === updated.documentId ? updated : user
+        ))
+      } else {
+        // Crear
+        const created = await userService.create(formData)
+        setUsers([...users, created])
+      }
+      setIsModalOpen(false)
+      setCurrentUser(null)
+    } catch (error) {
+      console.error('Error:', error)
+      alert(error.message)
+    }
   }
 
   const filteredUsers = users.filter(user => 
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.documentId.includes(searchTerm)
+    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.documentId?.includes(searchTerm)
   )
 
   return (
@@ -107,16 +135,16 @@ function UserManager() {
                 <thead className="bg-indigo-900/50"> {/* Fondo más oscuro para mejor contraste */}
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-extrabold text-white uppercase tracking-wider border-b border-white/20">
-                      Nombre
-                    </th>
-                    <th className="px-6 py-4 text-left text-sm font-extrabold text-white uppercase tracking-wider border-b border-white/20">
                       Documento
                     </th>
                     <th className="px-6 py-4 text-left text-sm font-extrabold text-white uppercase tracking-wider border-b border-white/20">
-                      Email
+                      Nombre
                     </th>
                     <th className="px-6 py-4 text-left text-sm font-extrabold text-white uppercase tracking-wider border-b border-white/20">
-                      Teléfono
+                      Tipo Documento
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-extrabold text-white uppercase tracking-wider border-b border-white/20">
+                      Email
                     </th>
                     <th className="px-6 py-4 text-left text-sm font-extrabold text-white uppercase tracking-wider border-b border-white/20">
                       Acciones
@@ -125,11 +153,11 @@ function UserManager() {
                 </thead>
                 <tbody className="divide-y divide-white/20">
                   {filteredUsers.map((user) => (
-                    <tr key={user.id} className="text-white hover:bg-white/10 transition-colors">
+                    <tr key={user.documentId} className="text-white hover:bg-white/10 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">{user.documentId}</td>
                       <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{user.documentType} {user.documentId}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{user.documentType?.typeName}</td>
                       <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{user.phone}</td>
                       {/* Modificar la sección de los botones de acciones */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex space-x-2">
@@ -143,7 +171,7 @@ function UserManager() {
                             </svg>
                           </button>
                           <button
-                            onClick={() => handleDelete(user.id)}
+                            onClick={() => handleDelete(user.documentId)}
                             className="text-white/90 hover:text-red-400 focus:outline-none transition-all duration-300 bg-transparent 
                                       border border-white/40 rounded-md p-1.5 hover:border-red-400"
                           >
