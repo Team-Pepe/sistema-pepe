@@ -6,6 +6,8 @@ function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState('')  // Añadimos estado para manejar errores
+  const [loading, setLoading] = useState(false)  // Añadimos estado para manejar carga
   const navigate = useNavigate()
   const location = useLocation()
   const { login } = useAuth()
@@ -13,23 +15,41 @@ function Login() {
   // Obtener la ruta a la que el usuario intentaba acceder (si existe)
   const from = location.state?.from?.pathname || '/dashboard'
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Login attempt with:', { email, password })
-    // Aquí iría la lógica de autenticación cuando implementes el backend
+    setError('')  // Limpiar errores previos
+    setLoading(true)  // Activar estado de carga
     
-    // Simular un login exitoso con los datos del usuario
-    const userData = {
-      id: 1,
-      email,
-      name: 'Usuario de Prueba'
+    try {
+      // Llamar a la API de login
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al iniciar sesión')
+      }
+      
+      // Guardar el token en localStorage
+      localStorage.setItem('token', data.data.token)
+      
+      // Llamar a la función login del contexto con los datos del usuario
+      login(data.data.user)
+      
+      // Redirigir a la página que el usuario intentaba acceder o al dashboard
+      navigate(from, { replace: true })
+    } catch (error) {
+      console.error('Error de login:', error)
+      setError(error.message)
+    } finally {
+      setLoading(false)  // Desactivar estado de carga
     }
-    
-    // Llamar a la función login del contexto
-    login(userData)
-    
-    // Redirigir a la página que el usuario intentaba acceder o al dashboard
-    navigate(from, { replace: true })
   }
 
   const togglePasswordVisibility = () => {
@@ -52,6 +72,13 @@ function Login() {
           
           {/* Formulario */}
           <form onSubmit={handleSubmit} className="p-10 pt-16 space-y-6">
+            {/* Mostrar mensaje de error si existe */}
+            {error && (
+              <div className="bg-red-500/30 text-white p-3 rounded-md text-sm animate-slide-up">
+                {error}
+              </div>
+            )}
+            
             {/* Campo de Email */}
             <div className="relative animate-slide-up" style={{animationDelay: '0.4s', animationFillMode: 'both'}}>
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none transition-colors duration-300">
@@ -70,6 +97,7 @@ function Login() {
                            placeholder:transition-colors placeholder:duration-300"
                 placeholder="Correo electrónico"
                 required
+                disabled={loading}
               />
             </div>
             
@@ -91,12 +119,14 @@ function Login() {
                            placeholder:transition-colors placeholder:duration-300"
                 placeholder="Contraseña"
                 required
+                disabled={loading}
               />
               {/* Icono de ojo para mostrar/ocultar contraseña */}
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
                 className="absolute inset-y-0 right-0 flex items-center pr-3 text-white hover:text-indigo-200 focus:outline-none transition-all duration-300 bg-transparent border-0 p-0"
+                disabled={loading}
               >
                 {showPassword ? (
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transition-transform duration-300 hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -134,9 +164,10 @@ function Login() {
             <div className="animate-slide-up" style={{animationDelay: '1s', animationFillMode: 'both'}}>
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold py-2 px-4 rounded-md transition-all duration-500 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform hover:scale-105 hover:shadow-xl active:scale-95"
+                className={`w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold py-2 px-4 rounded-md transition-all duration-500 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform hover:scale-105 hover:shadow-xl active:scale-95 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                disabled={loading}
               >
-                INICIAR SESIÓN
+                {loading ? 'INICIANDO SESIÓN...' : 'INICIAR SESIÓN'}
               </button>
             </div>
           </form>
