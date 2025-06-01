@@ -1,11 +1,11 @@
-import prisma from '../lib/prisma.js';
+import { db1, db2 } from '../lib/prisma.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export class AuthController {
   async register(req, res) {
     try {
-      // Validar que todos los campos requeridos estén presentes
+      // Validar campos requeridos
       const requiredFields = ['name', 'documentTypeId', 'documentId', 'email', 'password', 'phone', 'address', 'age'];
       const missingFields = requiredFields.filter(field => !req.body[field]);
       
@@ -16,21 +16,10 @@ export class AuthController {
         });
       }
 
-      console.log('Datos de registro:', req.body);
-
-      // Validar el formato del email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(req.body.email)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Formato de email inválido'
-        });
-      }
-
       const { password, ...userData } = req.body;
 
-      // Verificar si el usuario ya existe
-      const existingUser = await prisma.users.findFirst({
+      // Verificar si el usuario ya existe en la primera base de datos
+      const existingUser = await db1.users.findFirst({
         where: {
           OR: [
             { email: userData.email },
@@ -48,12 +37,22 @@ export class AuthController {
         });
       }
 
-      // Validar que documentTypeId sea un número válido
-      const documentType = await prisma.documentType.findUnique({
-        where: { id: parseInt(userData.documentTypeId) }
+      // Verificar si el usuario existe en la segunda base de datos
+      const existingLoginUser = await db2.loginUsers.findUnique({
+        where: { email: userData.email }
       });
 
-      console.log('Tipo de documento:', documentType);
+      if (existingLoginUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'El email ya está registrado en el sistema de login'
+        });
+      }
+
+      // Validar tipo de documento
+      const documentType = await db1.documentType.findUnique({
+        where: { id: parseInt(userData.documentTypeId) }
+      });
 
       if (!documentType) {
         return res.status(400).json({
@@ -65,8 +64,8 @@ export class AuthController {
       // Hash de la contraseña
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Crear usuario
-      const user = await prisma.users.create({
+      // Crear usuario en la primera base de datos
+      const user = await db1.users.create({
         data: {
           ...userData,
           documentTypeId: parseInt(userData.documentTypeId),
@@ -74,6 +73,16 @@ export class AuthController {
           password: hashedPassword
         }
       });
+
+      // Crear usuario en la segunda base de datos
+      const loginUser = await db2.loginUsers.create({
+        data: {
+          email: userData.email,
+          password: hashedPassword
+        }
+      });
+
+      console.log('Usuario creado en sistema de login:', loginUser);
 
       // Generar token
       const token = jwt.sign(
@@ -93,6 +102,16 @@ export class AuthController {
       });
     } catch (error) {
       console.error('Error en registro:', error);
+      
+      // Si hay error, intentar revertir las operaciones
+      if (error.code === 'P2002') {
+        // Error de unique constraint
+        return res.status(400).json({
+          success: false,
+          message: 'El email o documento ya está registrado'
+        });
+      }
+
       res.status(500).json({
         success: false,
         message: error.message || 'Error en el servidor'

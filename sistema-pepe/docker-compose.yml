@@ -20,12 +20,25 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - "5000:5000"
+    env_file:
+      - ./server/.env
+    volumes:
+      - ./server:/app
+      - /app/node_modules
     environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - DIRECT_URL=${DIRECT_URL}
       - NODE_ENV=development
+      # Variables de entorno explícitas con valores directos
+      - DATABASE_URL=postgresql://postgres.bxowxyujsqhqzditoykh:FwQRnjsH9hg2lF5I@aws-0-us-east-2.pooler.supabase.com:6543/postgres?pgbouncer=true
+      - DIRECT_URL=postgresql://postgres.bxowxyujsqhqzditoykh:FwQRnjsH9hg2lF5I@aws-0-us-east-2.pooler.supabase.com:5432/postgres
+      - DATABASE_URL_DB2=postgresql://postgres.vzfayjvhuosaxypmthqd:iZ6KiHlVZFz2nKWv@aws-0-us-east-2.pooler.supabase.com:6543/postgres?pgbouncer=true
+      - DIRECT_URL_DB2=postgresql://postgres.vzfayjvhuosaxypmthqd:iZ6KiHlVZFz2nKWv@aws-0-us-east-2.pooler.supabase.com:5432/postgres
     networks:
       - app-network
+    command: >
+      sh -c "
+        npm run prisma:generate &&
+        npm run prisma:push &&
+        npm run dev"
 
 networks:
   app-network:

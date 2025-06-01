@@ -4,9 +4,12 @@ WORKDIR /app
 
 # Copiar archivos de configuración
 COPY package*.json ./
+COPY prisma ./prisma/
 
-# Instalar dependencias incluyendo devDependencies
+# Instalar dependencias y generar Prisma Client
 RUN npm install
+RUN npx prisma generate --schema=./prisma/schema.prisma
+RUN npx prisma generate --schema=./prisma/schema2.prisma
 
 # Copiar el resto del código
 COPY . .
@@ -15,4 +18,4 @@ COPY . .
 EXPOSE 5000
 
 # Comando para iniciar en modo desarrollo
-CMD ["sh", "-c", "npx prisma generate && npx prisma db push --accept-data-loss && npm run dev"]
+CMD ["sh", "-c", "npm run prisma:push && npm run dev"]

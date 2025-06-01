@@ -11,7 +11,7 @@ function Register() {
     phone: '',
     address: '',
     birthdate: '',  // Changed from age to birthdate
-    password: '',
+    password: '', 
     confirmPassword: '' // Add this line
   })
 

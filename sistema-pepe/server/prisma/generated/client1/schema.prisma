@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client1"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model DocumentType {
+  id       Int     @id @default(autoincrement())
+  typeName String  @unique @db.VarChar(50)
+  users    Users[]
+
+  @@map("document_types")
+}
+
+model Users {
+  documentId     String       @id @db.VarChar(50) // Ahora es la llave primaria
+  name           String       @db.VarChar(100)
+  documentType   DocumentType @relation(fields: [documentTypeId], references: [id])
+  documentTypeId Int
+  email          String       @unique @db.VarChar(100)
+  password       String       @db.Text
+  phone          String       @db.VarChar(20)
+  address        String       @db.VarChar(200)
+  age            Int
+
+  @@map("users")
+}
