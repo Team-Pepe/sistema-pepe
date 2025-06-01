@@ -58,6 +58,19 @@ function UserFormModal({ isOpen, onClose, onSubmit, currentUser, documentTypes }
   // Clases base para contenedores de animación
   const baseAnimationClasses = "relative animate-slide-up"
 
+  const calculateAge = (birthdate) => {
+    if (!birthdate) return 0
+    const today = new Date()
+    const birthdateObj = new Date(birthdate)
+    let age = today.getFullYear() - birthdateObj.getFullYear()
+    const monthDiff = today.getMonth() - birthdateObj.getMonth()
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdateObj.getDate())) {
+      age--
+    }
+    return age
+  }
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white/20 backdrop-blur-md rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden animate-fade-in border border-white/20">
@@ -69,7 +82,17 @@ function UserFormModal({ isOpen, onClose, onSubmit, currentUser, documentTypes }
             </h3>
           </div>
 
-          <form onSubmit={(e) => { e.preventDefault(); onSubmit(formData) }} className="space-y-4">
+          <form onSubmit={(e) => {
+  e.preventDefault()
+  const dataToSubmit = {
+    ...formData,
+    documentTypeId: parseInt(formData.documentTypeId),
+    age: calculateAge(formData.birthdate)
+  }
+  // Eliminar birthdate antes de enviar
+  delete dataToSubmit.birthdate
+  onSubmit(dataToSubmit)
+}} className="space-y-4">
             {/* Nombre completo con animación */}
             <div className={baseAnimationClasses}>
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none transition-colors duration-300">

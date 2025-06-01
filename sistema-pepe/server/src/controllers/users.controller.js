@@ -16,15 +16,26 @@ export class UsersController {
 
   async create(req, res) {
     try {
+      const { birthdate, ...userData } = req.body // Extraer birthdate para no enviarlo a Prisma
+      
       const user = await db1.users.create({
-        data: req.body,
+        data: {
+          ...userData,
+          documentTypeId: parseInt(userData.documentTypeId),
+          age: parseInt(userData.age)
+        },
         include: {
           documentType: true
         }
       })
+
       res.status(201).json(user)
     } catch (error) {
-      res.status(500).json({ message: error.message })
+      console.error('Error al crear usuario:', error)
+      res.status(500).json({ 
+        message: 'Error al crear usuario',
+        error: error.message 
+      })
     }
   }
 
