@@ -121,7 +121,6 @@ export class AuthController {
 
   async login(req, res) {
     try {
-      // Validar campos requeridos
       const { email, password } = req.body;
       
       if (!email || !password) {
@@ -131,69 +130,25 @@ export class AuthController {
         });
       }
 
-      // Normalizar email (convertir a minúsculas)
       const normalizedEmail = email.toLowerCase();
+      console.log('🔍 Buscando usuario en db2 con email:', normalizedEmail);
 
-      // Buscar usuario en la primera base de datos
-      const user = await db1.users.findUnique({
+      // Verificar si existe en la base de datos de login (db2)
+      const loginUser = await db2.loginUsers.findUnique({
         where: { email: normalizedEmail }
       });
 
-      // Si no existe en la primera base, verificar en la segunda
-      if (!user) {
-        // Verificar si existe en la base de datos de login
-        const loginUser = await db2.loginUsers.findUnique({
-          where: { email: normalizedEmail }
-        });
-
-        if (!loginUser) {
-          return res.status(401).json({
-            success: false,
-            message: 'Credenciales inválidas'
-          });
-        }
-
-        // Verificar contraseña
-        const isPasswordValid = await bcrypt.compare(password, loginUser.password);
-        if (!isPasswordValid) {
-          return res.status(401).json({
-            success: false,
-            message: 'Credenciales inválidas'
-          });
-        }
-
-        // Buscar información completa del usuario en la primera base
-        const userInfo = await db1.users.findUnique({
-          where: { email: normalizedEmail }
-        });
-
-        if (!userInfo) {
-          return res.status(500).json({
-            success: false,
-            message: 'Error de sincronización entre bases de datos'
-          });
-        }
-
-        // Generar token
-        const token = jwt.sign(
-          { id: userInfo.documentId, email: userInfo.email },
-          process.env.JWT_SECRET,
-          { expiresIn: '1d' }
-        );
-
-        // Retornar respuesta sin la contraseña
-        const { password: _, ...userWithoutPassword } = userInfo;
-        return res.status(200).json({
-          success: true,
-          data: {
-            user: userWithoutPassword,
-            token
-          }
+      console.log('👤 Usuario encontrado en db2:', loginUser ? 'Sí' : 'No');
+      
+      if (!loginUser) {
+        return res.status(401).json({
+          success: false,
+          message: 'Credenciales inválidas'
         });
       }
 
       // Verificar contraseña
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+      const isPasswordValid = await bcrypt.compare(password, loginUser.password);
       if (!isPasswordValid) {
         return res.status(401).json({
           success: false,
@@ -201,22 +156,35 @@ export class AuthController {
         });
       }
 
+      // Buscar información completa del usuario en db1 para el token y respuesta
+      const userInfo = await db1.users.findUnique({
+        where: { email: normalizedEmail }
+      });
+
+      if (!userInfo) {
+        return res.status(500).json({
+          success: false,
+          message: 'Error de sincronización entre bases de datos'
+        });
+      }
+
       // Generar token
       const token = jwt.sign(
-        { id: user.documentId, email: user.email },
+        { id: userInfo.documentId, email: userInfo.email },
         process.env.JWT_SECRET,
         { expiresIn: '1d' }
       );
 
       // Retornar respuesta sin la contraseña
-      const { password: _, ...userWithoutPassword } = user;
-      res.status(200).json({
+      const { password: _, ...userWithoutPassword } = userInfo;
+      return res.status(200).json({
         success: true,
         data: {
           user: userWithoutPassword,
           token
         }
       });
+
     } catch (error) {
       console.error('Error en login:', error);
       res.status(500).json({

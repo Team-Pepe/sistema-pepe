@@ -87,7 +87,8 @@ function UserFormModal({ isOpen, onClose, onSubmit, currentUser, documentTypes }
   const dataToSubmit = {
     ...formData,
     documentTypeId: parseInt(formData.documentTypeId),
-    age: calculateAge(formData.birthdate)
+    age: calculateAge(formData.birthdate),
+    password: formData.password // Asegúrate de incluir el password
   }
   // Eliminar birthdate antes de enviar
   delete dataToSubmit.birthdate
