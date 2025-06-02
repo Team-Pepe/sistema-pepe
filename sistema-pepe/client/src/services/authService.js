@@ -22,3 +22,12 @@ export const register = async (userData) => {
     throw error
   }
 }
+
+export const requestPasswordReset = async (email) => {
+  const response = await fetch(`${API_URL}/auth/request-reset`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  })
+  return response.json()
+}
