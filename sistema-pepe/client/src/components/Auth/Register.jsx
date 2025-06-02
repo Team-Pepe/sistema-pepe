@@ -266,11 +266,11 @@ function Register() {
                   type="date"
                   value={formData.birthdate}
                   onChange={handleInputChange}
+                  max={new Date().toISOString().split('T')[0]} // Restringe hasta hoy
                   className="w-full pl-10 pr-3 py-2 bg-indigo-900/50 border border-white/20 rounded-md text-white
                              focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent
                              transition-all duration-500 focus:bg-indigo-900/70 hover:bg-indigo-900/60
                              placeholder:transition-colors placeholder:duration-300"
-                  placeholder="Edad"
                   required
                 />
               </div>

@@ -147,6 +147,12 @@ function UserManager() {
                       Email
                     </th>
                     <th className="px-6 py-4 text-left text-sm font-extrabold text-white uppercase tracking-wider border-b border-white/20">
+                      Dirección
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-extrabold text-white uppercase tracking-wider border-b border-white/20">
+                      Edad
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-extrabold text-white uppercase tracking-wider border-b border-white/20">
                       Acciones
                     </th>
                   </tr>
@@ -158,6 +164,8 @@ function UserManager() {
                       <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
                       <td className="px-6 py-4 whitespace-nowrap">{user.documentType?.typeName}</td>
                       <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{user.address}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{user.age}</td>
                       {/* Modificar la sección de los botones de acciones */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex space-x-2">

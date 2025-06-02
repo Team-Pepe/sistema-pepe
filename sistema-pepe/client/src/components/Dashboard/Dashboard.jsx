@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../routes'
 
 function Dashboard() {
   const [userName, setUserName] = useState('Usuario')
   const navigate = useNavigate()
+  const { logout } = useAuth()
   
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
+
   // Simulación de carga de datos del usuario
   // En producción, estos datos vendrían del backend
   useEffect(() => {
@@ -20,6 +27,19 @@ function Dashboard() {
     <div className="min-h-screen bg-gradient-to-br from-pink-300 via-purple-500 to-indigo-600 p-4 animate-gradient">
       {/* Contenedor principal */}
       <div className="container mx-auto py-8">
+        {/* Botón de logout */}
+        <div className="absolute top-4 right-4 animate-slide-up" style={{animationDelay: '1.2s', animationFillMode: 'both'}}>
+          <button
+            onClick={handleLogout}
+            className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-md transition-all duration-300 flex items-center space-x-2 border border-white/20 backdrop-blur-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span>Cerrar Sesión</span>
+          </button>
+        </div>
+
         {/* Tarjeta de bienvenida con efecto de vidrio */}
         <div className="relative bg-white/20 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden animate-fade-in border border-white/20 transform transition-all duration-700 hover:scale-[1.02] max-w-4xl mx-auto">
           {/* Icono de bienvenida */}

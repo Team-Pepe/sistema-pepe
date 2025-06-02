@@ -17,11 +17,10 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setError('')  // Limpiar errores previos
-    setLoading(true)  // Activar estado de carga
+    setError('')
+    setLoading(true)
     
     try {
-      // Llamar a la API de login
       const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: {
@@ -36,19 +35,16 @@ function Login() {
         throw new Error(data.message || 'Error al iniciar sesión')
       }
       
-      // Guardar el token en localStorage
       localStorage.setItem('token', data.data.token)
-      
-      // Llamar a la función login del contexto con los datos del usuario
       login(data.data.user)
       
-      // Redirigir a la página que el usuario intentaba acceder o al dashboard
-      navigate(from, { replace: true })
+      // Redirigir siempre al dashboard (ruta raíz)
+      navigate('/', { replace: true })
     } catch (error) {
       console.error('Error de login:', error)
       setError(error.message)
     } finally {
-      setLoading(false)  // Desactivar estado de carga
+      setLoading(false)
     }
   }
 

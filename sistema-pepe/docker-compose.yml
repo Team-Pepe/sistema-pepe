@@ -17,7 +17,7 @@ services:
   server:
     build:
       context: ./server
-      dockerfile: Dockerfile.dev
+      dockerfile: DockerFile.dev
     ports:
       - "5000:5000"
     env_file:

@@ -217,7 +217,9 @@ function UserFormModal({ isOpen, onClose, onSubmit, currentUser, documentTypes }
                   name="birthdate"
                   value={formData.birthdate}
                   onChange={handleInputChange}
+                  max={new Date().toISOString().split('T')[0]} // Restringe hasta hoy
                   className={baseInputClasses}
+                  placeholder="Fecha de nacimiento"
                   required
                 />
               </div>

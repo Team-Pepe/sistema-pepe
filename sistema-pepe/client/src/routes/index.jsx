@@ -1,11 +1,12 @@
-import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import Login from '../components/Auth/Login';
 import Register from '../components/Auth/Register';
 import ForgotPassword from '../components/Auth/ForgotPassword';
 import Dashboard from '../components/Dashboard/Dashboard';
 import UserManager from '../components/Users/UserManager';
-import { createContext, useState, useContext, useEffect } from 'react';
 import ProtectedRoute from '../components/Auth/ProtectedRoute';
+import PublicRoute from '../components/Auth/PublicRoute';
+import { createContext, useState, useContext, useEffect } from 'react';
 
 const AuthContext = createContext(null);
 
@@ -29,10 +30,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    // Limpiar el estado de autenticación
     setAuth({
       isAuthenticated: false,
       user: null
     });
+    
+    // Limpiar el localStorage
+    localStorage.removeItem('auth');
+    localStorage.removeItem('token');
   };
 
   return (
@@ -48,41 +54,27 @@ export const useAuth = () => useContext(AuthContext);
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navigate to="/login" replace />
+    element: <ProtectedRoute><Dashboard /></ProtectedRoute>
   },
-  // Rutas públicas (accesibles sin autenticación)
   {
     path: '/login',
-    element: <Login />
+    element: <PublicRoute><Login /></PublicRoute>
   },
   {
     path: '/register',
-    element: <Register />
+    element: <PublicRoute><Register /></PublicRoute>
   },
   {
     path: '/forgot-password',
-    element: <ForgotPassword />
-  },
-  // Rutas protegidas (requieren autenticación)
-  {
-    path: '/dashboard',
-    element: (
-      <ProtectedRoute>
-        <Dashboard />
-      </ProtectedRoute>
-    )
+    element: <PublicRoute><ForgotPassword /></PublicRoute>
   },
   {
     path: '/users',
-    element: (
-      <ProtectedRoute>
-        <UserManager />
-      </ProtectedRoute>
-    )
+    element: <ProtectedRoute><UserManager /></ProtectedRoute>
   },
   {
     path: '*',
-    element: <Navigate to="/login" replace />
+    element: <Navigate to="/" replace />
   }
 ]);
 
