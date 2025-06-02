@@ -65,16 +65,60 @@ export class UsersController {
   async update(req, res) {
     try {
       const { documentId } = req.params
-      const user = await db1.users.update({
+      const updateData = req.body
+
+      // 1. Primero obtener el usuario actual de db1 para tener el email actual
+      const currentUser = await db1.users.findUnique({
+        where: { documentId }
+      })
+
+      if (!currentUser) {
+        return res.status(404).json({ 
+          message: 'Usuario no encontrado' 
+        })
+      }
+
+      // 2. Actualizar usuario en db1
+      const updatedUser = await db1.users.update({
         where: { documentId },
-        data: req.body,
+        data: updateData,
         include: {
           documentType: true
         }
       })
-      res.json(user)
+
+      // 3. Si el email está siendo actualizado, actualizarlo también en db2
+      if (updateData.email && updateData.email !== currentUser.email) {
+        try {
+          // Buscar el usuario en db2 por el email anterior
+          const loginUser = await db2.loginUsers.findUnique({
+            where: { email: currentUser.email }
+          })
+
+          if (loginUser) {
+            // Actualizar email en db2
+            await db2.loginUsers.update({
+              where: { email: currentUser.email },
+              data: { email: updateData.email }
+            })
+            console.log('✅ Email actualizado en db2:', updateData.email)
+          } else {
+            console.log('⚠️ Usuario no encontrado en db2')
+          }
+        } catch (error) {
+          console.error('Error al actualizar email en db2:', error)
+          // No detenemos la operación si falla la actualización en db2
+        }
+      }
+
+      res.json(updatedUser)
+
     } catch (error) {
-      res.status(500).json({ message: error.message })
+      console.error('Error en actualización:', error)
+      res.status(500).json({ 
+        message: 'Error al actualizar usuario',
+        error: error.message 
+      })
     }
   }
 
