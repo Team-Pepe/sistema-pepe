@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
-import { db2 } from '../lib/prisma.js'
+import bcrypt from 'bcryptjs'
+import { db1, db2 } from '../lib/prisma.js'
 import { sendResetPasswordEmail } from '../services/emailService.js'
 
 export class PasswordResetController {
@@ -51,10 +52,17 @@ export class PasswordResetController {
       // Verificar token
       const decoded = jwt.verify(token, process.env.JWT_SECRET)
       
-      // Actualizar contraseña
+      // Hash de la nueva contraseña
       const hashedPassword = await bcrypt.hash(newPassword, 10)
       
+      // Actualizar en db2 (login_users)
       await db2.loginUsers.update({
+        where: { email: decoded.email },
+        data: { password: hashedPassword }
+      })
+
+      // Actualizar en db1 (users)
+      await db1.users.update({
         where: { email: decoded.email },
         data: { password: hashedPassword }
       })
@@ -68,7 +76,7 @@ export class PasswordResetController {
       console.error('Error al restablecer contraseña:', error)
       res.status(400).json({
         success: false,
-        message: 'Token inválido o expirado'
+        message: error.name === 'JsonWebTokenError' ? 'Token inválido o expirado' : 'Error al restablecer la contraseña'
       })
     }
   }

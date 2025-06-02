@@ -40,14 +40,15 @@ export const resetPassword = async (token, newPassword) => {
       body: JSON.stringify({ token, newPassword })
     });
 
+    const data = await response.json()
+
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Error al restablecer contraseña');
+      throw new Error(data.message || 'Error al restablecer contraseña')
     }
 
-    return response.json();
+    return data
   } catch (error) {
-    console.error('Error:', error);
-    throw error;
+    console.error('Error:', error)
+    throw error
   }
 }
