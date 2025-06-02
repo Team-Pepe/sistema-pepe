@@ -5,6 +5,7 @@ import { config } from 'dotenv';
 import { db1, db2 } from './lib/prisma.js';
 import authRoutes from './routes/auth.routes.js';
 import usersRoutes from './routes/users.routes.js';
+import passwordResetRoutes from './routes/passwordReset.routes.js';
 
 
 config();
@@ -47,6 +48,7 @@ app.get('/health', async (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/auth', passwordResetRoutes); // Agregar esta línea
 
 const PORT = process.env.PORT || 5000;
 

@@ -1,16 +1,25 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { requestPasswordReset } from '../../services/authService' // Corregida la ruta
 
 function ForgotPassword() {
   const [email, setEmail] = useState('')
   const [isSent, setIsSent] = useState(false)
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Password recovery attempt with:', { email })
-    // Aquí iría la lógica de recuperación de contraseña cuando implementes el backend
-    setIsSent(true)
+    try {
+      const result = await requestPasswordReset(email)
+      if (result.success) {
+        setIsSent(true)
+      } else {
+        // Manejar error
+        console.error(result.message)
+      }
+    } catch (error) {
+      console.error('Error:', error)
+    }
   }
 
   return (
@@ -100,14 +109,16 @@ function ForgotPassword() {
                 </button>
               </div>
               
-              // Cambiar el enlace de vuelta al login
-              // Busca donde está el enlace "Volver al login" y reemplázalo con:
-              <Link 
-                to="/login"
-                className="text-white hover:text-indigo-200 transition-all duration-300 hover:underline"
-              >
-                Volver al login
-              </Link>
+              {/* Cambiar el enlace de vuelta al login */}
+              <div className="text-center text-sm animate-slide-up" style={{animationDelay: '0.6s', animationFillMode: 'both'}}>
+                <span className="text-white">¿Ya tienes una cuenta? </span>
+                <Link 
+                  to="/login"
+                  className="text-white hover:text-indigo-200 transition-all duration-300 hover:underline"
+                >
+                  Inicia sesión
+                </Link>
+              </div>
             </div>
           )}
         </div>
