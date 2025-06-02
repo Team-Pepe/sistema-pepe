@@ -1,24 +1,12 @@
-import { useState } from 'react'
-import Login from './components/Auth/Login'
-import Register from './components/Auth/Register'
-import ForgotPassword from './components/Auth/ForgotPassword'
+import { AuthProvider } from './routes'
+import { RouterProvider } from 'react-router-dom'
+import router from './routes'
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('login')
-
   return (
-    <>
-      {currentPage === 'login' ? (
-        <Login 
-          onRegisterClick={() => setCurrentPage('register')} 
-          onForgotPasswordClick={() => setCurrentPage('forgotPassword')} 
-        />
-      ) : currentPage === 'register' ? (
-        <Register onLoginClick={() => setCurrentPage('login')} />
-      ) : (
-        <ForgotPassword onLoginClick={() => setCurrentPage('login')} />
-      )}
-    </>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   )
 }
 

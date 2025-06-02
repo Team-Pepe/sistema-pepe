@@ -27,7 +27,7 @@ export class PasswordResetController {
         { expiresIn: '1h' }
       )
 
-      // Enviar email
+      // Enviar email con el token
       await sendResetPasswordEmail(email, resetToken)
 
       res.json({

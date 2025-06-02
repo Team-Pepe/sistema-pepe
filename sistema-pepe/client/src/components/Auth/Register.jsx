@@ -294,9 +294,10 @@ function Register() {
                   className="w-full pl-10 pr-10 py-2 bg-indigo-900/50 border border-white/20 rounded-md text-white
                              focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent
                              transition-all duration-500 focus:bg-indigo-900/70 hover:bg-indigo-900/60
-                             placeholder:transition-colors placeholder:duration-300"
+                             [&::-ms-reveal]:hidden [&::-ms-clear]:hidden"
                   placeholder="Contraseña"
                   required
+                  autoComplete="new-password"
                 />
                 <button
                   type="button"
@@ -332,9 +333,10 @@ function Register() {
                   className="w-full pl-10 pr-10 py-2 bg-indigo-900/50 border border-white/20 rounded-md text-white
                              focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent
                              transition-all duration-500 focus:bg-indigo-900/70 hover:bg-indigo-900/60
-                             placeholder:transition-colors placeholder:duration-300"
+                             [&::-ms-reveal]:hidden [&::-ms-clear]:hidden"
                   placeholder="Confirmar contraseña"
                   required
+                  autoComplete="new-password"
                 />
                 <button
                   type="button"

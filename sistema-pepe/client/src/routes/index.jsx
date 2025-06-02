@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import Login from '../components/Auth/Login';
 import Register from '../components/Auth/Register';
 import ForgotPassword from '../components/Auth/ForgotPassword';
+import ResetPassword from '../components/Auth/ResetPassword'; // Agregar esta importación
 import Dashboard from '../components/Dashboard/Dashboard';
 import UserManager from '../components/Users/UserManager';
 import ProtectedRoute from '../components/Auth/ProtectedRoute';
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
   {
     path: '/forgot-password',
     element: <PublicRoute><ForgotPassword /></PublicRoute>
+  },
+  {
+    path: '/reset-password/:token',
+    element: <PublicRoute><ResetPassword /></PublicRoute>
   },
   {
     path: '/users',
