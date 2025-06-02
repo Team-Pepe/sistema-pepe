@@ -29,6 +29,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
     command: >
       sh -c "
+        npm install &&
         npx prisma generate &&
         npx prisma db push --accept-data-loss &&
         npm run dev"
