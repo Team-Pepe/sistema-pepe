@@ -65,7 +65,7 @@ export class UsersController {
   async update(req, res) {
     try {
       const { documentId } = req.params
-      const updateData = req.body
+      const { password, birthdate, ...updateData } = req.body // Excluimos password y birthdate
 
       // 1. Primero obtener el usuario actual de db1 para tener el email actual
       const currentUser = await db1.users.findUnique({
@@ -81,7 +81,11 @@ export class UsersController {
       // 2. Actualizar usuario en db1
       const updatedUser = await db1.users.update({
         where: { documentId },
-        data: updateData,
+        data: {
+          ...updateData,
+          documentTypeId: parseInt(updateData.documentTypeId),
+          age: parseInt(updateData.age)
+        },
         include: {
           documentType: true
         }
